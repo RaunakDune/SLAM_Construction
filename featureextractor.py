@@ -6,6 +6,7 @@ from display import Display
 import numpy as np
 from skimage.measure import ransac
 from skimage.transform import FundamentalMatrixTransform
+from skimage.transform import EssentialMatrixTransform
 
 os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
@@ -38,7 +39,7 @@ class FeatureExtractor(object):
 
         feats = cv2.goodFeaturesToTrack(np.mean(img, axis = 2).astype(np.uint8), 3000, qualityLevel = 0.01, minDistance = 3)
         kps = [cv2.KeyPoint(x = f[0][0], y = f[0][1], _size = 20) for f in feats]
-        kps, des = self.orb.compute(img, kps)
+        kps, des = self.orb.compute(img, kps) 
 
         ret = []
 
@@ -53,6 +54,10 @@ class FeatureExtractor(object):
         
         if len(ret) > 0:
             ret = np.array(ret)
+
+            ret[:, :, 0] -= img.shape[0] // 2
+            ret[:, :, 1] -= img.shape[1] // 2
+            
             model, inliers = ransac((ret[:, 0],
                                     ret[:, 1]), 
                                     FundamentalMatrixTransform,
