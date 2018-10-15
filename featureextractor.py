@@ -4,6 +4,8 @@ import time
 import cv2
 from display import Display
 import numpy as np
+from skimage.measure import ransac
+from skimage.transform import FundamentalMatrixTransform
 
 os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
@@ -45,7 +47,20 @@ class FeatureExtractor(object):
 
             for m,n in matches:
                 if m.distance < 0.75 * n.distance:
-                    ret.append((kps[m.queryIdx], self.last['kps'][m.trainIdx]))
+                    kp1 = kps[m.queryIdx].pt
+                    kp2 = self.last['kps'][m.trainIdx].pt
+                    ret.append((kp1, kp2))
+        
+        if len(ret) > 0:
+            ret = np.array(ret)
+            model, inliers = ransac((ret[:, 0],
+                                    ret[:, 1]), 
+                                    FundamentalMatrixTransform,
+                                    min_samples = 8,
+                                    residual_threshold = 1,
+                                    max_trials=100)
+
+            ret = ret[inliers]
 
         self.last = {'kps': kps, 'des': des}
 
