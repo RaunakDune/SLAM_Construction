@@ -10,9 +10,13 @@ os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
 W = 1920 // 2
 H = 1080 // 2
+F = 1
 
 disp = Display(W,H)
-fe = FeatureExtractor(W, H)
+
+K = np.array([[F, 0, W//2], [0, F, H//2], [0, 0, 1]])
+
+fe = FeatureExtractor(K)
 
 def process_frame(img):
     img = cv2.resize(img, (W,H))

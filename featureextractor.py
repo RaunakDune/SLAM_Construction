@@ -10,16 +10,22 @@ from skimage.transform import EssentialMatrixTransform
 
 os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
+def add_ones(x):
+    return np.concatenate([x, np.ones((x.shape[0],1))], axis = 1)
+
 class FeatureExtractor(object):
 
-    def __init__(self, w, h):
+    def __init__(self, K):
         self.orb = cv2.ORB_create()
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
         self.last = None
-        self.w, self.h = w, h
-
+        self.K = K
+        self.Kinv = np.linalg.inv(self.K)
+        
     def denormalize(self, pt):
-        return int(round(pt[0] + self.w)), int(round(pt[1] + self.h))
+        ret = np.dot(self.K, np.array([pt[0], pt[1], 1.0]))
+        # ret /= ret[2]
+        return int(round(ret[0])), int(round(ret[1]))
     
     def extact(self, img):
 
@@ -41,8 +47,8 @@ class FeatureExtractor(object):
         if len(ret) > 0:
             ret = np.array(ret)
 
-            ret[:, :, 0] -= img.shape[0] // 2
-            ret[:, :, 1] -= img.shape[1] // 2
+            ret[:, 0, :] = np.dot(self.Kinv, add_ones(ret[:, 0, :]).T).T[:, 0:2]
+            ret[:, 1, :] = np.dot(self.Kinv, add_ones(ret[:, 1, :]).T).T[:, 0:2]
 
             model, inliers = ransac((ret[:, 0],
                                     ret[:, 1]), 
@@ -53,8 +59,7 @@ class FeatureExtractor(object):
 
             ret = ret[inliers]
 
-            s,v,d = np.linalg.svd(model.params)
-            print(v)
+            # s,v,d = np.linalg.svd(model.params)
 
         self.last = {'kps': kps, 'des': des}
 
