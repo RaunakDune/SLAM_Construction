@@ -13,6 +13,8 @@ os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 def add_ones(x):
     return np.concatenate([x, np.ones((x.shape[0],1))], axis = 1)
 
+f_est_avg = []
+
 class FeatureExtractor(object):
 
     def __init__(self, K):
@@ -63,7 +65,11 @@ class FeatureExtractor(object):
 
             ret = ret[inliers]
 
-            # s,v,d = np.linalg.svd(model.params)
+            s,v,d = np.linalg.svd(model.params)
+            f_est = np.sqrt(2) / ((v[0] + v[1]) / 2)
+            f_est_avg.append(f_est)
+            print (f_est, np.median(f_est_avg))
+
 
         self.last = {'kps': kps, 'des': des}
 
