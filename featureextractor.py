@@ -21,7 +21,11 @@ class FeatureExtractor(object):
         self.last = None
         self.K = K
         self.Kinv = np.linalg.inv(self.K)
-        
+
+    def normalize(self, pts):
+        return np.dot(self.Kinv, add_ones(pts).T).T[:, 0:2]
+
+
     def denormalize(self, pt):
         ret = np.dot(self.K, np.array([pt[0], pt[1], 1.0]))
         # ret /= ret[2]
@@ -47,8 +51,8 @@ class FeatureExtractor(object):
         if len(ret) > 0:
             ret = np.array(ret)
 
-            ret[:, 0, :] = np.dot(self.Kinv, add_ones(ret[:, 0, :]).T).T[:, 0:2]
-            ret[:, 1, :] = np.dot(self.Kinv, add_ones(ret[:, 1, :]).T).T[:, 0:2]
+            ret[:, 0, :] = self.normalize(ret[:, 0, :])
+            ret[:, 1, :] = self.normalize(ret[:, 1, :])
 
             model, inliers = ransac((ret[:, 0],
                                     ret[:, 1]), 
