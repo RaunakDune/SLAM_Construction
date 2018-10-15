@@ -16,11 +16,17 @@ fe = FeatureExtractor()
 
 def process_frame(img):
     img = cv2.resize(img, (W,H))
-    kps, des, matches = fe.extact(img)
+    matches = fe.extact(img)
 
-    for p in kps:
-        u,v = map(lambda x: int(round(x)), p.pt)
-        cv2.circle(img, (u,v), color = (0,0,255), radius=3)
+    
+
+    for pt1, pt2 in matches:
+        u1,v1 = map(lambda x: int(round(x)), pt1.pt)
+        u2,v2 = map(lambda x: int(round(x)), pt2.pt)
+        cv2.circle(img, (u1,v1), color = (0,0,255), radius=3)
+        cv2.line(img, (u1, v1), (u2, v2), color = (0,255,0))
+    
+
     disp.paint(img)
 
 if __name__ == "__main__":
