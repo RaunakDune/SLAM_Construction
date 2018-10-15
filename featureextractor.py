@@ -16,6 +16,10 @@ class FeatureExtractor(object):
         self.orb = cv2.ORB_create()
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
         self.last = None
+        self.w, self.h = w, h
+
+    def denormalize(self, pt):
+        return int(round(pt[0] + self.w)), int(round(pt[1] + self.h))
     
     def extact(self, img):
 
