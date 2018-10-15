@@ -11,31 +11,13 @@ from skimage.transform import EssentialMatrixTransform
 os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
 class FeatureExtractor(object):
-    # GX = 16 // 2
-    # GY = 12 // 2
 
-    def __init__(self):
+    def __init__(self, w, h):
         self.orb = cv2.ORB_create()
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
         self.last = None
     
     def extact(self, img):
-
-        # sy = img.shape[0]//self.GY
-        # sx = img.shape[1]//self.GX
-
-        # akp = []
-
-        # for ry in range(0, img.shape[0], sy):
-        #     for rx in range(0, img.shape[1], sx):
-        #         img_chunk = img[ry: ry+sy, rx: rx+sx]
-        #         kp = self.orb.detect(img_chunk, None)
-
-        #         for p in kp:
-        #             p.pt = (p.pt[0] + rx, p.pt[1] + ry)
-        #             akp.append(p)
-
-        # return akp
 
         feats = cv2.goodFeaturesToTrack(np.mean(img, axis = 2).astype(np.uint8), 3000, qualityLevel = 0.01, minDistance = 3)
         kps = [cv2.KeyPoint(x = f[0][0], y = f[0][1], _size = 20) for f in feats]
@@ -57,7 +39,7 @@ class FeatureExtractor(object):
 
             ret[:, :, 0] -= img.shape[0] // 2
             ret[:, :, 1] -= img.shape[1] // 2
-            
+
             model, inliers = ransac((ret[:, 0],
                                     ret[:, 1]), 
                                     FundamentalMatrixTransform,
@@ -67,7 +49,9 @@ class FeatureExtractor(object):
 
             ret = ret[inliers]
 
+            s,v,d = np.linalg.svd(model.params)
+            print(v)
+
         self.last = {'kps': kps, 'des': des}
 
-        # return kps, des, matches
         return ret

@@ -12,13 +12,11 @@ W = 1920 // 2
 H = 1080 // 2
 
 disp = Display(W,H)
-fe = FeatureExtractor()
+fe = FeatureExtractor(W, H)
 
 def process_frame(img):
     img = cv2.resize(img, (W,H))
     matches = fe.extact(img)
-
-    # print("%d matches" % (len(matches)))
 
     def denormalize(pt):
         return int(round(pt[0] + img.shape[0] / 2)), int(round(pt[1] + img.shape[1]/2))
