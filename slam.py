@@ -10,7 +10,7 @@ os.environ["PYSDL2_DLL_PATH"] = "D:\\Software\\Python libs"
 
 W = 1920 // 2
 H = 1080 // 2
-F = 1510
+F = 1510 // 6
 
 disp = Display(W,H)
 
