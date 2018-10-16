@@ -20,7 +20,10 @@ fe = FeatureExtractor(K)
 
 def process_frame(img):
     img = cv2.resize(img, (W,H))
-    matches = fe.extact(img)
+    matches, pose = fe.extact(img)
+
+    if pose is None:
+        return
 
     for pt1, pt2 in matches:
         u1,v1 = fe.denormalize(pt1)

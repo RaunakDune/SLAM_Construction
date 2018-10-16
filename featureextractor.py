@@ -29,6 +29,9 @@ def extractRt(E):
         R = np.dot(np.dot(U, W.T), Vt)                
     t = U[:, 2]
 
+    Rt = np.concatenate([R,t.reshape(3,1)], axis = 1)
+    return Rt
+
 class FeatureExtractor(object):
 
     def __init__(self, K):
@@ -64,6 +67,7 @@ class FeatureExtractor(object):
                     kp2 = self.last['kps'][m.trainIdx].pt
                     ret.append((kp1, kp2))
         
+        Rt = None
         if len(ret) > 0:
             ret = np.array(ret)
 
@@ -77,8 +81,8 @@ class FeatureExtractor(object):
                                     residual_threshold = 0.005,
                                     max_trials=200)
             ret = ret[inliers]
-            extractRt(model.params)
+            Rt = extractRt(model.params)
 
         self.last = {'kps': kps, 'des': des}
 
-        return ret
+        return ret, Rt
