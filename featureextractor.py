@@ -16,7 +16,7 @@ def add_ones(x):
 def extractRt(E):
     W = np.mat([[0,-1,0],[1,0,0],[0,0,1]], dtype=float)
 
-    U, w, Vt = np.linalg.svd(model.params)
+    U, w, Vt = np.linalg.svd(E)
     
     if np.linalg.det(U) < 0:
         U *= -1.0
